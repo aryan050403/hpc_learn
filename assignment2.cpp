@@ -1,7 +1,15 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 
-void merge(vector<int> &arr, int left, int mid, int right) {
+vector<int> generateRandomArray(int size) {
+    vector<int> array(size); 
+    for (int i = 0; i < size; i++) {
+        array[i] = rand() % 1000; 
+    }
+    return array;
+}
+
+void merge(vector<int>& arr, int left, int mid, int right) {
     vector<int> temp;
     int i = left, j = mid + 1;
 
@@ -15,13 +23,11 @@ void merge(vector<int> &arr, int left, int mid, int right) {
     while (i <= mid) temp.push_back(arr[i++]);
     while (j <= right) temp.push_back(arr[j++]);
 
-    // Copy back to original array
     for (int k = 0; k < temp.size(); k++)
         arr[left + k] = temp[k];
 }
 
-// Parallel merge sort
-void parallelMergeSort(vector<int> &arr, int left, int right) {
+void parallelMergeSort(vector<int>& arr, int left, int right) {
     if (left < right) {
         int mid = (left + right) / 2;
 
@@ -38,19 +44,37 @@ void parallelMergeSort(vector<int> &arr, int left, int right) {
     }
 }
 
-int main(){
-    vector<int> arr = {9, 7, 3, 8, 1, 2, 5, 4, 6};
+void seqMergeSort(vector<int>& arr, int left, int right) {
+    if (left < right) {
+        int mid = (left + right) / 2;
+        seqMergeSort(arr, left, mid); 
+        seqMergeSort(arr, mid + 1, right);
+        merge(arr, left, mid, right);
+    }
+}
 
-    cout << "Original array: ";
-    for (int x : arr) cout << x << " ";
-        cout << endl;
-    auto start=std::chrono::high_resolution_clock::now();
+int main() {
+    int size;
+    cout << "Enter the size of the array: ";
+    cin >> size;
+
+    vector<int> arr = generateRandomArray(size); 
+
+    
+    auto start = std::chrono::high_resolution_clock::now();
     parallelMergeSort(arr, 0, arr.size() - 1);
-    auto end=std::chrono::high_resolution_clock::now();
-    cout << "Sorted array: ";
-    for (int x : arr) cout << x << " ";
-    cout << endl;
-    std::chrono::duration<double> duration=end-start;
-    cout<<"Time taken: "<<duration.count()<<"s"<<endl;
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration = end - start;
+    cout << "Time taken (Parallelly): " << duration.count() << "s" << endl;
+
+
+    cout << "Sequential merge sort: ";
+    vector<int> arrSeq = generateRandomArray(size); 
+    auto startSeq = std::chrono::high_resolution_clock::now();
+    seqMergeSort(arrSeq, 0, arrSeq.size() - 1);
+    auto endSeq = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> durationSeq = endSeq - startSeq;
+    cout << "Time taken (Sequentially): " << durationSeq.count() << "s" << endl;
+
     return 0;
 }
